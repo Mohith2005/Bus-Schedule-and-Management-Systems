@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bus Route Scheduling - DTC</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .route-page {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 60px 0;
+      min-height: 100vh;
+    }
+
+    .route-container {
+      background-color: rgba(255, 255, 255, 0.85);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 1000px;
+      text-align: center;
+      margin: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 12px;
+    }
+
+    th {
+      background-color: #18bc9c;
+      color: white;
+    }
+
+    button.delete-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    button.delete-btn:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo"><h1>DTC Bus Management</h1></div>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="staff_scheduling.php">Scheduling</a></li>
+      <li><a href="route_scheduling.html">Route Scheduling</a></li>
+      <li><a href="map.html">Map</a></li>
+      <li><a href="index.html">Logout</a></li>
+    </ul>
+  </nav>
+
+  <section class="route-page">
+    <div class="route-container">
+      <h2>Add New Route</h2>
+      <form id="add-form">
+        <input type="text" name="bus_id" placeholder="Bus ID" required>
+        <input type="text" name="source" placeholder="Source" required>
+        <input type="text" name="destination" placeholder="Destination" required>
+        <input type="time" name="departure_time" required>
+        <input type="time" name="arrival_time" required>
+        <input type="date" name="date" required>
+        <select name="status" required>
+          <option value="On Time">On Time</option>
+          <option value="Delayed">Delayed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+        <button type="submit">Add Route</button>
+      </form>
+
+      <h3>All Bus Routes</h3>
+      <table id="routes-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Bus ID</th>
+            <th>Route</th>
+            <th>Departure</th>
+            <th>Arrival</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <script>
+    // Fetch and display all routes
+    function loadRoutes() {
+      fetch('scripts/get_routes.php')
+        .then(res => res.json())
+        .then(routes => {
+          const tbody = document.querySelector("#routes-table tbody");
+          tbody.innerHTML = "";
+
+          if (routes.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='8'>No routes found.</td></tr>";
+            return;
+          }
+
+          routes.forEach(route => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${route.id}</td>
+              <td>${route.bus_id}</td>
+              <td>${route.source} → ${route.destination}</td>
+              <td>${route.departure_time}</td>
+              <td>${route.arrival_time}</td>
+              <td>${route.date}</td>
+              <td>${route.status}</td>
+              <td><button class="delete-btn" onclick="deleteRoute(${route.id})">Delete</button></td>
+            `;
+            tbody.appendChild(row);
+          });
+        })
+        .catch(err => {
+          alert("Failed to fetch routes: " + err);
+        });
+    }
+
+    // Delete route function
+    function deleteRoute(id) {
+      if (!confirm("Are you sure you want to delete this route?")) return;
+
+      fetch(`scripts/delete_route.php?id=${id}`)
+        .then(res => res.text())
+        .then(msg => {
+          alert(msg);
+          loadRoutes(); // Refresh table
+        })
+        .catch(err => {
+          alert("Failed to delete route: " + err);
+        });
+    }
+
+    // Add new route
+    document.getElementById("add-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+
+      fetch("scripts/add_route.php", {
+        method: "POST",
+        body: new URLSearchParams(formData)
+      })
+        .then(res => res.text())
+        .then(msg => {
+          alert(msg);
+          this.reset();
+          loadRoutes();
+        })
+        .catch(error => alert("Error: " + error));
+    });
+
+    // Initial load
+    window.onload = loadRoutes;
+  </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DTC Bus Management - Welcome</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .index-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to right, #18bc9c, #2c3e50);
+        }
+
+        .index-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px 60px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .index-container h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .login-buttons {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+        }
+
+        .login-buttons a {
+            background-color: #18bc9c;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-buttons a:hover {
+            background-color: #14957e;
+        }
+    </style>
+</head>
+<body>
+    <div class="index-page">
+        <div class="index-container">
+            <h1>Welcome to DTC Bus Management System</h1>
+            <div class="login-buttons">
+                <a href="login_user.html">User</a>
+                <a href="login_admin.html">Admin</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

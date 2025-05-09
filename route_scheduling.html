@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Route Scheduling - DTC</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+
+    #map {
+      height: 90vh;
+      width: 100%;
+    }
+
+    .controls {
+      padding: 10px;
+      background: #f9f9f9;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    select, button {
+      padding: 8px;
+      font-size: 1em;
+    }
+
+    h2 {
+      text-align: center;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>DTC Route Scheduler (Smart Navigation)</h2>
+
+<div class="controls">
+  <label for="source">Source:</label>
+  <select id="source"></select>
+
+  <label for="destination">Destination:</label>
+  <select id="destination"></select>
+
+  <button onclick="route()">Plan Route</button>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+<script>
+  const map = L.map('map').setView([28.6139, 77.2090], 12);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  const busStops = {
+    "Connaught Place": { "location": [28.6315, 77.2167], "connections": ["India Gate", "Janpath", "Paharganj"] },
+    "India Gate": { "location": [28.6129, 77.2295], "connections": ["Connaught Place", "Pragati Maidan"] },
+    "Janpath": { "location": [28.6265, 77.2182], "connections": ["Connaught Place", "Rajpath"] },
+    "Paharganj": { "location": [28.6448, 77.2159], "connections": ["Connaught Place", "New Delhi Railway Station"] },
+    "New Delhi Railway Station": { "location": [28.6411, 77.2182], "connections": ["Paharganj", "Chandni Chowk"] },
+    "Chandni Chowk": { "location": [28.6562, 77.2301], "connections": ["New Delhi Railway Station", "Red Fort"] },
+    "Red Fort": { "location": [28.6562, 77.2410], "connections": ["Chandni Chowk", "Jama Masjid"] },
+    "Jama Masjid": { "location": [28.6507, 77.2334], "connections": ["Red Fort", "Rajghat"] },
+    "Rajghat": { "location": [28.6288, 77.2456], "connections": ["Jama Masjid", "Pragati Maidan"] },
+    "Pragati Maidan": { "location": [28.6136, 77.2481], "connections": ["India Gate", "Rajghat"] },
+    "Rajpath": { "location": [28.6146, 77.2058], "connections": ["Janpath", "Rashtrapati Bhavan"] },
+    "Rashtrapati Bhavan": { "location": [28.6143, 77.1995], "connections": ["Rajpath", "Chanakyapuri"] },
+    "Chanakyapuri": { "location": [28.5963, 77.1821], "connections": ["Rashtrapati Bhavan", "Safdarjung"] },
+    "Safdarjung": { "location": [28.5721, 77.2026], "connections": ["Chanakyapuri", "AIIMS"] },
+    "AIIMS": { "location": [28.5672, 77.2100], "connections": ["Safdarjung", "Hauz Khas"] },
+    "Hauz Khas": { "location": [28.5494, 77.1995], "connections": ["AIIMS", "Green Park"] },
+    "Green Park": { "location": [28.5584, 77.2027], "connections": ["Hauz Khas", "Saket"] },
+    "Saket": { "location": [28.5265, 77.2105], "connections": ["Green Park", "Qutub Minar"] },
+    "Qutub Minar": { "location": [28.5244, 77.1855], "connections": ["Saket", "Mehrauli"] },
+    "Mehrauli": { "location": [28.5195, 77.1656], "connections": ["Qutub Minar", "Chhatarpur"] },
+    "Chhatarpur": { "location": [28.5028, 77.1758], "connections": ["Mehrauli", "Vasant Kunj"] },
+    "Vasant Kunj": { "location": [28.5205, 77.1620], "connections": ["Chhatarpur", "IGI Airport"] },
+    "IGI Airport": { "location": [28.5562, 77.1000], "connections": ["Vasant Kunj", "Dwarka"] },
+    "Dwarka": { "location": [28.5840, 77.0680], "connections": ["IGI Airport", "Janakpuri"] },
+    "Janakpuri": { "location": [28.6235, 77.0930], "connections": ["Dwarka", "Rajouri Garden"] },
+    "Rajouri Garden": { "location": [28.6510, 77.1238], "connections": ["Janakpuri", "Punjabi Bagh"] },
+    "Punjabi Bagh": { "location": [28.6676, 77.1330], "connections": ["Rajouri Garden", "Pitampura"] },
+    "Pitampura": { "location": [28.6966, 77.1420], "connections": ["Punjabi Bagh", "Rohini"] },
+    "Rohini": { "location": [28.7363, 77.1200], "connections": ["Pitampura"] }
+  };
+
+  const sourceSelect = document.getElementById("source");
+  const destSelect = document.getElementById("destination");
+
+  for (let stop in busStops) {
+    sourceSelect.add(new Option(stop, stop));
+    destSelect.add(new Option(stop, stop));
+    L.marker(busStops[stop].location).addTo(map).bindPopup(`<strong>${stop}</strong>`);
+  }
+
+  const blockedRoads = [
+    { lat: 28.6265, lng: 77.2182, name: "Janpath Blocked" },
+    { lat: 28.6562, lng: 77.2301, name: "Chandni Chowk Closed" }
+  ];
+
+  blockedRoads.forEach(block => {
+    L.circleMarker([block.lat, block.lng], {
+      radius: 8,
+      color: 'red',
+      fillOpacity: 0.7
+    }).addTo(map).bindPopup(block.name);
+  });
+
+  let routingControl;
+
+  function route() {
+    const source = sourceSelect.value;
+    const destination = destSelect.value;
+
+    if (!source || !destination || source === destination) {
+      alert("Please select different Source and Destination.");
+      return;
+    }
+
+    if (routingControl) {
+      map.removeControl(routingControl);
+    }
+
+    const path = [source];
+    const visited = new Set();
+    const queue = [[source]];
+
+    while (queue.length > 0) {
+      const currentPath = queue.shift();
+      const currentStop = currentPath[currentPath.length - 1];
+
+      if (currentStop === destination) {
+        path.length = 0;
+        path.push(...currentPath);
+        break;
+      }
+
+      if (!busStops[currentStop] || visited.has(currentStop)) continue;
+      visited.add(currentStop);
+
+      for (const neighbor of busStops[currentStop].connections) {
+        if (!visited.has(neighbor)) {
+          queue.push([...currentPath, neighbor]);
+        }
+      }
+    }
+
+    if (path.length < 2) {
+      alert("No route found between selected stops.");
+      return;
+    }
+
+    const waypoints = path.map(stop => L.latLng(...busStops[stop].location));
+
+    routingControl = L.Routing.control({
+      waypoints: waypoints,
+      routeWhileDragging: false,
+      showAlternatives: false,
+      createMarker: function (i, wp) {
+        return L.marker(wp.latLng).bindPopup(`${i === 0 ? "Start" : (i === waypoints.length - 1 ? "End" : "Stop")}: ${path[i]}`);
+      },
+      lineOptions: {
+        styles: [{ color: '#007bff', opacity: 0.8, weight: 6 }]
+      }
+    }).addTo(map);
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bus Route Selection - DTC Bus Scheduling</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="logo">
+      <h1>DTC Bus Management</h1>
+    </div>
+    <ul>
+      <li><a href="login_user.html">Login</a></li>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="signup.html">Sign Up</a></li>
+      <li><a href="map.html">Map</a></li>
+      <li><a href="index.html">Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- Route Search Section -->
+  <section class="route-page">
+    <div class="route-container">
+      <h2>Search Bus Routes</h2>
+
+      <!-- Search Form -->
+      <form id="route-form">
+        <label for="source">Source:</label>
+        <input type="text" id="source" name="source" required>
+
+        <label for="destination">Destination:</label>
+        <input type="text" id="destination" name="destination" required>
+
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required>
+
+        <button type="submit">Search Buses</button>
+      </form>
+
+      <!-- Results Table -->
+      <div id="result-container">
+        <h3>Available Buses</h3>
+        <table id="results-table" class="styled-table">
+          <thead>
+            <tr>
+              <th>Bus ID</th>
+              <th>Route</th>
+              <th>Departure</th>
+              <th>Arrival</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Data will be inserted dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <script src="script1.js"></script>
+</body>
+</html>

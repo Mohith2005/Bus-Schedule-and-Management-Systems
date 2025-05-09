@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - DTC Bus Scheduling</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="navbar">
+        <div class="logo">
+            <h1>DTC Bus Management</h1>
+        </div>
+        
+    </nav>
+
+    <!-- Login Page -->
+    <section class="auth-page">
+        <div class="auth-container">
+            <h2>Login</h2>
+            <form action="scripts/login.php" method="POST">
+                <label for="username">Username:</label>
+                <input type="text" name="username" id="username" placeholder="Enter your username" required>
+
+                <label for="password">Password:</label>
+                <input type="password" name="password" id="password" placeholder="Enter your password" required>
+
+                <button type="submit">Login</button>
+            </form>
+
+            <p class="redirect-link">
+                Don't have an account? <a href="signup.html">Sign Up</a>
+            </p>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
