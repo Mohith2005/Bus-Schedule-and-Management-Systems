@@ -132,7 +132,8 @@
         <li><a href="login_user.html">Login</a></li>
         <li><a href="index.html">Home</a></li>
         <li><a href="staff_scheduling.php">Scheduling</a></li>
-        <li><a href="route.html">Bus Route</a></li>
+        <li><a href="route_scheduling.html">Route Scheduling</a></li>
+        <li><a href="bus_route.html">Bus Route</a></li>
         <li><a href="map.html">Map</a></li>
         <li><a href="index.html">Logout</a></li>
     </ul>
