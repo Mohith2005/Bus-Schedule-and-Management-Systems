@@ -121,7 +121,7 @@
 <!-- Navigation Bar -->
 <nav class="navbar">
     <div class="logo">
-        <h1>DTC Bus Management</h1>
+        <h1>TTC Bus Management</h1>
     </div>
     <ul>
         <li><a href="login_user.html">Login</a></li>
@@ -135,7 +135,7 @@
 
 <!-- Main Content -->
 <section class="auth-container">
-    <h1>Welcome to DTC Route Portal</h1>
+    <h1>Welcome to TTC Route Portal</h1>
 </section>
 
 </body>
